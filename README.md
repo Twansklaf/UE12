@@ -1,2 +1,6 @@
 # UE12
-UE 12 Extraction d'information
+## Projet UE12 Extraction de l'information
+
+```python
+pip install python-twitter
+``` 
