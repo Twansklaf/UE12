@@ -61,3 +61,9 @@ def create_annot() :
 
 dumped = parse_archive()
 # create_annot()
+
+def init_annotation_app() :
+	values = parse_archive()
+	keys = [key for key in values]
+
+	return len(keys), keys, values
