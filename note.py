@@ -3,43 +3,48 @@ import random as rd
 from tkinter import *
 # from pynput.keyboard import Key, Listener
 from parse import init_annotation_app
+from parse import parse_tweet
 
 sizemax, keys, values = init_annotation_app()
 active_tweet_id = 0
 
-def retrieve_tweet(id) :
-	return values[id]
+# def retrieve_tweet(id) :
+# 	return values[id]
 
 def pick_tweet() :
 	global active_tweet_id
-	file = open("annotation.data", 'r')
+	file = open("tw_db.data", 'r')
 	lines = file.readlines()
 	tryint = rd.randint(0, sizemax)
 	
-	if len(lines[tryint].split(",")) > 1 and lines[tryint].split(",")[1][0] == '_' :
-		active_tweet_id = lines[tryint].split(",")[0][1:]
-		return retrieve_tweet(active_tweet_id)
+	tw = parse_tweet(lines[tryint])
+
+	if tw['tag'] == '???':
+		active_tweet_id = tw['id']
+		# return retrieve_tweet(active_tweet_id)
+		return tw['text']
 
 	else :
 		tryint = rd.randint(0, sizemax)
-		while len(lines[tryint].split(",")) > 1 and lines[tryint].split(",")[1][0] != '_' :
+		while tw['tag'] != '???' :
 			tryint = rd.randint(0, sizemax)
 		
 		# not annoted
-		active_tweet_id = lines[tryint].split(",")[0][1:]
-		return retrieve_tweet(active_tweet_id)
+		active_tweet_id = tw['id']
+		return tw['text']
 
 
 def write_emotion(id, emote) :
-	fileread = open("annotation.data")
+
+	fileread = open("tw_db.data", "r")
 	read = fileread.read()
 	fileread.close()
 	print("replacing")
-	print("(" + str(id) + ",_)")
+	print(str(id) + ",???")
 	print("with")
-	print("(" + str(id) + "," + emote + ")")
-	filetest = open("annotation.data", "w")
-	filetest.write(read.replace("(" + str(id) + ",_)", "(" + str(id) + "," + emote + ")"))
+	print(str(id) + "," + emote)
+	filetest = open("tw_db.data", "w")
+	filetest.write(read.replace(str(id) + ",???", str(id)+ "," + emote))
 	filetest.close()
 
 

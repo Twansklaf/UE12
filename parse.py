@@ -1,9 +1,5 @@
 import sys
 import json
-file = open('twitterdata2.txt', 'r')
-file2= open('twitterdata.txt', 'r')
-file3= open('twitterdata3.txt', 'r')
-
 
 def parse_file(file) :
 	values = {}
@@ -24,32 +20,13 @@ def parse_file(file) :
 				tmpvalue['text'] += line.split('_n')[0]
 	return values
 
-# values = parse_file(file)
-# values2 = parse_file(file2)
-# file.close()		
-# file2.close()
-
-# values = {**values, **values2}
-# values = {**values, **parse_file(file3)}
-
-# file3.close()
-
-# ids = [key for key in values]
-# # print(values['1100706495421992961'])
-
-# file = open('formatted.data', 'w')
-# for key in values :
-# 	file.write(json.dumps(values[key]) + "\n")
-
-# file.close()
 
 def parse_archive() :
 	values = {}
-	file = open('formatted.data', 'r')
+	file = open('tw_db.data', 'r')
 	for line in file.readlines() :
-		# print(line[:-1]) # to remove cr
-		strdump = json.loads(line[:-1])
-		values[strdump['id']] = strdump['text']
+		obj = parse_tweet(line)
+		values[obj['id']] = obj['text']
 	return values
 
 def create_annot() :
@@ -58,8 +35,8 @@ def create_annot() :
 		file.write("(" + key + ",???,collected by group 5)" + dumped[key].replace("\n", "") + "\n")
 	file.close()
 
-dumped = parse_archive()
-create_annot()
+# dumped = parse_archive()
+# create_annot()
 
 def init_annotation_app() :
 	values = parse_archive()
@@ -136,4 +113,4 @@ def merge_new_data(filestr) :
 	
 	print(str(len(ids) - len(old_ids)) + " insertions, new number of tweets is : " + str(len(ids)) )
 
-merge_new_data("newd.txt")
+merge_new_data("data.txt")
