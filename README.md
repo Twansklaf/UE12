@@ -14,3 +14,9 @@ Access token & access token secret
 4096983503-9GUudKy0I0E4mNENQDAvNwHvKvL2pujSERjYZcU (Access token)
 
 dxxIXULVExrOy74EJ2UOZI8tmXytyo089h4TyliJ8AxQj (Access token secret)
+
+Skeleton.py retrieves tweet and writes them to twitterdatax.txt
+
+parse.py parse these tweets and write them to formatted data
+
+note display tweets and stores their note.
