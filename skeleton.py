@@ -16,11 +16,11 @@ try:
   for tweet in ts.search_tweets_iterable(tso):
     if count < 1000 :
       # print( '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
-      print(tweet['text'])
-      print(tweet['truncated'])
-      for key in tweet :
-        print(key)
-      count += 1
+      # print(tweet)
+      if not tweet['text'][0:2] == "RT" :
+        print("id: " + str(tweet['id']))
+        print("text: " + tweet['text'])
+        count += 1
     else :
       break
 

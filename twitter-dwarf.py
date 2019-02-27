@@ -1,9 +1,9 @@
 import twitter
 
-c_key =
-c_secret =
-a_key =
-a_secret =
+c_key = 'P6OXKneDo1VgIsLaf7Hfz71pb',
+c_secret = 'ggdOmpO0m6IMBDLal6CKijWWAc1nR6XoM9eA2jC1LcJ9yEaiRD',
+a_key = '4096983503-9GUudKy0I0E4mNENQDAvNwHvKvL2pujSERjYZcU',
+a_secret = 'dxxIXULVExrOy74EJ2UOZI8tmXytyo089h4TyliJ8AxQj'
 
 api = twitter.Api(consumer_key=[c_key],
                   consumer_secret=[c_secret],
