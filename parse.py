@@ -1,5 +1,22 @@
 import sys
 import json
+import re
+
+
+emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           "]+", flags=re.UNICODE)
+
+
+def remove_emoji(inputstr) :
+	return emoji_pattern.sub(r'', inputstr)
+
+def remove_emoji_file() :
+	values = parse_archive()
+	write_archive(values)
 
 def parse_file(file) :
 	values = {}
@@ -26,7 +43,7 @@ def parse_archive() :
 	file = open('tw_db.data', 'r')
 	for line in file.readlines() :
 		obj = parse_tweet(line)
-		values[obj['id']] = obj['text']
+		values[obj['id']] = obj
 	return values
 
 def create_annot() :
@@ -54,10 +71,9 @@ def parse_tweet(text):
 	return {'id': groups[0], 'tag': groups[1], 'params': groups[2], 'text': groups[-1]}
 
 def write_archive(dict_tw) :
-	
 	file = open("tw_db.data", "w")
 	for key in dict_tw :
-		file.write(("(" + key + "," + dict_tw[key]['tag'] + dict_tw[key]['params'] +")" + dict_tw[key]['text'].replace("\n", "") + "\n"))
+		file.write(("(" + key + "," + dict_tw[key]['tag'] + dict_tw[key]['params'] +")" + remove_emoji(dict_tw[key]['text'].replace("\n", "")) + "\n"))
 	file.close()
 
 
@@ -101,7 +117,7 @@ def merge_new_data(filestr) :
 	for key in newvalues :
 		if not key in ids :
 			file = open("tw_db.data", "a")
-			file.write(("(" + key + "," + "???" + ",collected by group 5" +")" + newvalues[key]['text'].replace("\n", "") + "\n"))
+			file.write(("(" + key + "," + "???" + ",collected by group 5" +")" + remove_emoji(newvalues[key]['text'].replace("\n", "")) + "\n"))
 			file.close()
 
 	old_ids = ids
