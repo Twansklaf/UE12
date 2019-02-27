@@ -4,6 +4,7 @@ try:
   tso.set_keywords(['Macron']) # let's define all words we would like to have a look for
   tso.set_language('fr') # we want to see German tweets only
   tso.set_include_entities(False) # and don't give us all those entity information
+  tso.arguments.update({'tweet_mode':'extended'})
 
   # it's about time to create a TwitterSearch object with our secret tokens
   ts = TwitterSearch(
@@ -14,12 +15,13 @@ try:
   )
   count=0
   for tweet in ts.search_tweets_iterable(tso):
-    if count < 1000 :
+    if count < 5000 :
       # print( '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
       # print(tweet)
-      if not tweet['text'][0:2] == "RT" :
+      if not tweet['full_text'][0:2] == "RT" :
         print("id: " + str(tweet['id']))
-        print("text: " + tweet['text'])
+        print("text: " + tweet['full_text'])
+        print('end: ')
         count += 1
     else :
       break
