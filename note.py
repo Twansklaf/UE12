@@ -6,6 +6,7 @@ from parse import init_annotation_app
 from parse import parse_tweet
 import re
 
+
 def check_annotations(values_dict) :
 	to_ret = 0
 	for key in values_dict :
@@ -55,6 +56,7 @@ def write_emotion(id, emote) :
 
 
 can = Canvas(None, width=1200, height=100, background='white')
+
 can.pack()
 active_text = can.create_text(0, 0, text=pick_tweet(),font="Arial 16", width=1000, fill="black", anchor=NW)
 
@@ -81,18 +83,23 @@ def callback(event, active_text):
 	can.delete("all")
 	active_text = can.create_text(0, 0, text=pick_tweet(),font="Arial 16", width=1000, fill="black", anchor=NW)
 	can2.delete("all")
-	can2.create_text(0, 50, text=(str(num_done) + "/" + str(sizemax)), font="Arial 32", fill='black', anchor=W)
+	can2.create_text(0, 50, text=(str(num_done) + " / " + str(sizemax)), font="Arial 32", fill='black', anchor=W)
+	can2.create_image(0, 250, image=img, anchor=W)
 	can.pack()
 	can2.pack()
 	can.focus_set()
 
 def toplevel():
   top = Toplevel()
-  top.geometry("200x100+100+100")
-  can2 = Canvas(top, width=200, height=100, background="white")
-  txt = can2.create_text(0, 50, text=(str(num_done) + "/" + str(sizemax)), font="Arial 32", fill='black', anchor=W)
+  top.geometry("500x320+100+100")
+  can2 = Canvas(top, width=500, height=320, background="white")
+  txt = can2.create_text(0, 50, text=(str(num_done) + " / " + str(sizemax)), font="Arial 32", fill='black', anchor=W)
+  can2.create_image(0, 250, image=img, anchor=W)
   can2.pack()
   return can2
+
+
+img = PhotoImage(file="bindings.png")
 
 can.bind("<Key>", lambda event : callback(event, active_text))
 can.focus_set()
