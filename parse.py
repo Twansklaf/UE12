@@ -14,9 +14,16 @@ emoji_pattern = re.compile("["
 def remove_emoji(inputstr) :
 	return emoji_pattern.sub(r'', inputstr)
 
-def remove_emoji_file() :
-	values = parse_archive()
-	write_archive(values)
+def remove_emoji_file(filestr) :
+	file = open(filestr, "r")
+	filer = file.read()
+	file.close()
+	filer = bytes(filer, 'utf-8').decode('utf-8', 'ignore').encode('utf-8').decode('utf-8')
+	file = open(filestr, "w")
+	file.write(filer)
+	file.close()
+	values = parse_archive(filestr)
+	write_archive(values, filestr)
 
 def parse_file(file) :
 	values = {}
@@ -38,9 +45,9 @@ def parse_file(file) :
 	return values
 
 
-def parse_archive() :
+def parse_archive(filestr="tw_db.data") :
 	values = {}
-	file = open('tw_db.data', 'r')
+	file = open(filestr, 'r', encoding='utf-8')
 	for line in file.readlines() :
 		obj = parse_tweet(line)
 		values[obj['id']] = obj
@@ -55,11 +62,23 @@ def create_annot() :
 # dumped = parse_archive()
 # create_annot()
 
-def init_annotation_app() :
-	values = parse_archive()
+def init_annotation_app(filestr="tw_db.data") :
+	values = parse_archive(filestr)
 	keys = [key for key in values]
+	count_tab = [0, 0, 0, 0, 0]
+	for key in keys : 
+		if values[key]['tag'] == '???' :
+			count_tab[0] += 1
+		elif values[key]['tag'] == 'neu' :
+			count_tab[1] += 1
+		elif values[key]['tag'] == 'pos' :
+			count_tab[2] += 1
+		elif values[key]['tag'] == 'neg' :
+			count_tab[3] += 1
+		else :
+			count_tab[4] += 1
 
-	return len(keys), keys, values
+	return len(keys), keys, values, count_tab
 
 def parse_tweet(text):
 	import re
@@ -70,8 +89,8 @@ def parse_tweet(text):
 		groups = match.groups()
 	return {'id': groups[0], 'tag': groups[1], 'params': groups[2], 'text': groups[-1]}
 
-def write_archive(dict_tw) :
-	file = open("tw_db.data", "w")
+def write_archive(dict_tw, filestr="tw_db.data") :
+	file = open(filestr, "w")
 	for key in dict_tw :
 		file.write(("(" + key + "," + dict_tw[key]['tag'] + dict_tw[key]['params'] +")" + remove_emoji(dict_tw[key]['text'].replace("\n", "")) + "\n"))
 	file.close()
@@ -96,6 +115,16 @@ def parse_whole() :
 	print(len([key for key in values_dict]))
 	write_archive(values_dict)
 
+def two_pass() :
+	values = parse_archive()
+	list_text = []
+	values_to_write = {}
+	for key in values :
+		if not values[key]['text'] in list_text :
+			list_text.append(values[key]['text'])
+			values_to_write[key] = values[key]
+
+	write_archive(values_to_write)
 
 # parse_whole()
 
@@ -128,5 +157,14 @@ def merge_new_data(filestr) :
 	file.close()	
 	
 	print(str(len(ids) - len(old_ids)) + " insertions, new number of tweets is : " + str(len(ids)) )
+	two_pass()
+	print("Eliminating doublons")
+	values = parse_archive()
 
-merge_new_data("data.txt")
+	print(str(len([key for key in values])) + " entries in the dump file")
+
+# two_pass()
+
+import sys
+if len(sys.argv) > 1 and sys.argv[1] == "--merge" :
+	merge_new_data("data.txt")
