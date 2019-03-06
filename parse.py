@@ -25,6 +25,41 @@ def remove_emoji_file(filestr) :
 	values = parse_archive(filestr)
 	write_archive(values, filestr)
 
+def get_common(filestr1, filestr2) :
+	from functools import reduce
+	values1 = parse_archive(filestr1)
+	values2 = parse_archive(filestr2)
+	print(values2[1102648202547920896])
+	id1 = set([key for key in values1])
+	id2 = set([key for key in values2])
+	common = id1.intersection(id2)
+	count = reduce(lambda x, y:x+y, [1 if values1[key]['tag'] != "???" else 0 for key in common])
+	print(count)
+
+def sample_data(filestr, count) :
+	values = parse_archive(filestr)
+	text_set = []
+	for id in values :
+		if count == 0 :
+			return text_set
+		else :
+			if values[id]['tag'] == '???' :
+				text_set.append(values[id]['text'])
+				count -= 1
+	return text_set
+
+
+
+def get_data(filestr) :
+	values = parse_archive(filestr)
+	text_set = []
+	tag_set = []
+	for key in values :
+		if values[key]['tag'] != "???" :
+			text_set.append(values[key]['text'])
+			tag_set.append(values[key]['tag'])
+	return (text_set, tag_set)
+
 def parse_file(file) :
 	values = {}
 	tmpvalue = {}
@@ -163,8 +198,27 @@ def merge_new_data(filestr) :
 
 	print(str(len([key for key in values])) + " entries in the dump file")
 
+def merge_formatted_data(filestr1, filestr2) :
+	values1 = parse_archive(filestr1)
+	values2 = parse_archive(filestr2)
+	for key in values2 :
+		if not key in values1 :
+			values1[key] = values2[key]
+		else :
+			values1[key]['tag'] = values2[key]['tag']
+
+	write_archive(values1, filestr1)
+
+
 # two_pass()
 
 import sys
-if len(sys.argv) > 1 and sys.argv[1] == "--merge" :
-	merge_new_data("data.txt")
+if len(sys.argv) > 1 :
+	if sys.argv[1] == "--merge" :
+		merge_new_data("data.txt")
+	elif sys.argv[1] == "--merge2" :
+		merge_formatted_data(sys.argv[2], sys.argv[3])
+	elif sys.argv[1] == "--common" :
+		get_common(sys.argv[2], sys.argv[3])
+
+remove_emoji_file("groupe_5.txt")

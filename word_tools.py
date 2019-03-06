@@ -1,6 +1,6 @@
 import re
 import sys
-from parse import parse_tweet
+from parse import parse_tweet, parse_archive
 
 def get_list_tweet(filestr) :
 	list_tw = []
@@ -79,8 +79,10 @@ def copy_tweet_database(filestr) :
 	fileout.close()
 
 
+
 def vectorize_tweets(tweetstr, dicostr) :
 	vects = {}
+	tags = []
 	dico = load_dictionary("dico.txt")
 	file = open(tweetstr, 'r')
 	# print(sizedico)
@@ -88,9 +90,10 @@ def vectorize_tweets(tweetstr, dicostr) :
 		twt = parse_tweet(linetweet)
 		if twt['tag'] != "???" and twt['tag'] != "irr" :
 			vects[twt['id']] = [0 for x in dico]
+			tags.append(twt['tag'])
 			for word in twt['text'].split(" ") :
 				vects[twt['id']][int(dico[word])] = 1
-	return vects
+	return vects, tags
 			
 def load_dictionary(filestr) :
 	dico = {}
@@ -110,22 +113,28 @@ def write_dictionary(dictionary) :
 		count +=1
 	file.close()
 
-if len(sys.argv) > 1 :
-	list_tweet = get_list_tweet(sys.argv[1])
+# if len(sys.argv) > 1 :
+# 	if(sys.argv[1] == '--rebuild') :
+# 		copy_tweet_database(sys.argv[2])
+# 		list_tweet = get_list_tweet(sys.argv[2])
+# 		dico = build_dico(list_tweet)
+# 		write_dictionary(dico)
+# else :
+# 	dico = load_dictionary("dico.txt")
 
+
+# print(len(dico))
+# vects = vectorize_tweets("tw_db_prepared.data", "dico.txt")
+# print(len([k for k in vects]))
 
 # print(list_tweet[0])
 # print(type(processTweet(list_tweet[0])))
 
 # dico = build_dico(list_tweet)
-# print(len(dico))
 # write_dictionary(dico)
 
 # def load_dico(filestr) :
 	
 # 	file = open(filestr, 'r')
 
-# copy_tweet_database(sys.argv[1])
-
-vects = vectorize_tweets("tw_db_prepared.data", "dico.txt")
-print(len([k for k in vects]))
+copy_tweet_database(sys.argv[1])
