@@ -89,7 +89,7 @@ def copy_tweet_database(filestr, copystr) :
 	fileout = open(copystr, 'w')
 	for line in file.readlines() :
 		tw = parse_tweet(line)
-		fileout.write("(" + str(tw['id']) + "," + tw['tag'] + tw['params'] + ")" + processTweet(tw['text']) + "\n")
+		fileout.write("(" + str(tw['id']) + "," + tw['tag'] + ")" + processTweet(tw['text']) + "\n")
 	file.close()
 	fileout.close()
 
@@ -205,4 +205,4 @@ if len(sys.argv) > 1 :
 	
 # 	file = open(filestr, 'r')
 
-copy_tweet_database("finalcorpus.txt", "corpus_ready.data")
+# copy_tweet_database("groupe_8.data", "groupe_8.data")

@@ -238,5 +238,5 @@ def merge_formatted_data(filestr1, filestr2) :
 # merge_new_data("groupe_9_final.txt")
 # merge_new_data("tweets_groupe_6.txt")
 
-values = parse_archive()
-write_annotated(values, "tw_db_final.txt")
+# values = parse_archive()
+# write_annotated(values, "tw_db_final.txt")

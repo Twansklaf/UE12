@@ -8,6 +8,12 @@ pip install python-twitter
 ### Extraction 
 skeleton.py utilise l'api twitter pour récupérer des tweets sur le sujet qui nous intéresse, en Français
 
+
+### Entrainement des modèles
+Divers modèle sont écrits dans les jupyter notebook. 
+Deux sont basés sur LTSM, les autres sont des modèles "custom". Parmi ces custom, deux sont basés sur
+une couche Embeddings, l'autre est constitué de simple couches. 
+
 #################### RESTE #######################
 
 Consumer API keys
