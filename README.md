@@ -1,6 +1,34 @@
 # UE12
 ## Projet UE12 Extraction de l'information
 
+#### Requirements
+
+__Dependencies__
+* python 3.6.7
+* tkinter (for note.py only)
+* TwitterSearch
+* keras
+* pandas
+
+#### Tools
+
+* Jupyter
+
+#### How to make a python kernel 3.6.7 for Jupyter
+
+```bash
+apt-get install python3.6
+(python3.6 -m pip install venv)
+python3.6 -m venv mypython36jupyter
+cd mypython36jupyter
+source bin/activate
+pip install ipykernel
+python -m ipykernel install --user
+
+```
+
+
+
 ```python
 pip install python-twitter
 ``` 
