@@ -47,12 +47,13 @@ def processTweet(tweet):
 		tweet = re.sub(r'@[^\s]+','',tweet)
 		# remove numbers
 		tweet = re.sub(r'\d+', ' ', tweet)
+		tweet = re.sub(r'([a-z])([A-Z])','\\1 \\2', tweet)
 		# Remove tickers
 		tweet = re.sub(r'\$\w*', '', tweet)
 		# To lowercase
 		tweet = tweet.lower()
 		# Remove hyperlinks
-		tweet = re.sub(r'https?:\/\/.*\/\w*', '', tweet)
+		tweet = re.sub(r'https:\/\/t.co\/.{9}', '', tweet)
 		# Remove hashtags
 		tweet = re.sub(r'#', ' ', tweet)
 		# Remove Punctuation and split 's, 't, 've with a space for filter
@@ -68,10 +69,24 @@ def processTweet(tweet):
 		tweet = ''.join(c for c in tweet if c <= '\uFFFF') 
 		return tweet
 
+def make_bagofwords(filestr, word_count) :
+	values = parse_archive(filestr)
+	bow = {}
+	for id in values:
+		for word in values[id]['text'].split(" ") :
+			if word in bow :
+				bow[word] += 1
+			else :
+				bow[word] = 1
+	bowL = []
+	for key in bow :
+		bowL.append((key, bow[key]))
+	bowL.sort(key=lambda x: x[1])
+	return [x[0] for x in bowL[-word_count:]]
 
-def copy_tweet_database(filestr) :
+def copy_tweet_database(filestr, copystr) :
 	file = open(filestr, 'r')
-	fileout = open('tw_db_prepared.data', 'w')
+	fileout = open(copystr, 'w')
 	for line in file.readlines() :
 		tw = parse_tweet(line)
 		fileout.write("(" + str(tw['id']) + "," + tw['tag'] + tw['params'] + ")" + processTweet(tw['text']) + "\n")
@@ -80,20 +95,71 @@ def copy_tweet_database(filestr) :
 
 
 
-def vectorize_tweets(tweetstr, dicostr) :
-	vects = {}
-	tags = []
-	dico = load_dictionary("dico.txt")
-	file = open(tweetstr, 'r')
-	# print(sizedico)
-	for linetweet in file.readlines() :
-		twt = parse_tweet(linetweet)
-		if twt['tag'] != "???" and twt['tag'] != "irr" :
-			vects[twt['id']] = [0 for x in dico]
-			tags.append(twt['tag'])
-			for word in twt['text'].split(" ") :
-				vects[twt['id']][int(dico[word])] = 1
-	return vects, tags
+def vectorize_tweets(filestr, dico) :
+	values = parse_archive(filestr)
+	vectors = {}
+	import numpy as np
+	max_tweet_size = np.max([len(values[id]['text'].split(' ')) for id in values])
+
+
+	for id in values :
+		if values[id]['tag'] != "???" : 
+			vectors[id] = {'text' : values[id]['text']}
+			if values[id]['tag'] == 'irr' :
+				vectors[id]['label'] = [1, 0, 0, 0]
+			elif values[id]['tag'] == 'neg' :
+				vectors[id]['label'] = [0, 1, 0, 0]
+			elif values[id]['tag'] == 'neu' :
+				vectors[id]['label'] = [0, 0, 1, 0]
+			elif values[id]['tag'] == 'pos' :
+				vectors[id]['label'] = [0, 0, 0, 1]
+			else :
+				vectors[id]['label'] = [0, 0, 0, 0]
+			vectors[id]['label'] = np.array(vectors[id]['label'])
+			tmp_vect = []
+			for word in vectors[id]['text'].split(' ') :
+				try :
+					tmp_vect.append(dico.index(word))
+				except:
+					tmp_vect.append(0)
+			if len(tmp_vect) < max_tweet_size :
+				tmp_vect += [0 for i in range(max_tweet_size - len(tmp_vect))]
+			vectors[id]['vectorized'] = np.array(tmp_vect)
+
+	return vectors
+
+
+def vectorize_tweet(tw, tag, dico, input_size) :
+	vector = {}
+	import numpy as np
+	max_tweet_size = input_size
+
+	vector = {'text' : tw}
+	if tag == 'irr' :
+		vector['label'] = [1, 0, 0, 0]
+	elif tag == 'neg' :
+		vector['label'] = [0, 1, 0, 0]
+	elif tag == 'neu' :
+		vector['label'] = [0, 0, 1, 0]
+	elif tag == 'pos' :
+		vector['label'] = [0, 0, 0, 1]
+	else :
+		vector['label'] = [0, 0, 0, 0]
+
+	vector['label'] = np.array(vector['label'])
+
+	tmp_vect = []
+	for word in vector['text'].split(' ') :
+		try :
+			tmp_vect.append(dico.index(word))
+		except:
+			tmp_vect.append(0)
+	if len(tmp_vect) < max_tweet_size :
+		tmp_vect += [0 for i in range(max_tweet_size - len(tmp_vect))]
+	vector['vectorized'] = np.array(tmp_vect)
+
+	return vector
+	
 			
 def load_dictionary(filestr) :
 	dico = {}
@@ -113,14 +179,16 @@ def write_dictionary(dictionary) :
 		count +=1
 	file.close()
 
-# if len(sys.argv) > 1 :
-# 	if(sys.argv[1] == '--rebuild') :
-# 		copy_tweet_database(sys.argv[2])
-# 		list_tweet = get_list_tweet(sys.argv[2])
-# 		dico = build_dico(list_tweet)
-# 		write_dictionary(dico)
-# else :
-# 	dico = load_dictionary("dico.txt")
+if len(sys.argv) > 1 :
+	if sys.argv[1] == '--rebuild' :
+		copy_tweet_database(sys.argv[2])
+		list_tweet = get_list_tweet(sys.argv[2])
+		dico = build_dico(list_tweet)
+		write_dictionary(dico)
+	elif sys.argv[1] == '--buildic' :
+		dico = load_dictionary("dico.txt")
+	elif sys.argv[1] == '--update' :
+		copy_tweet_database(sys.argv[2])
 
 
 # print(len(dico))
@@ -137,4 +205,4 @@ def write_dictionary(dictionary) :
 	
 # 	file = open(filestr, 'r')
 
-copy_tweet_database(sys.argv[1])
+copy_tweet_database("finalcorpus.txt", "corpus_ready.data")

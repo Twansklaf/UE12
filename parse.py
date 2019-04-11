@@ -122,12 +122,23 @@ def parse_tweet(text):
 	matches = re.finditer(regex, text, re.MULTILINE)
 	for matchNum, match in enumerate(matches, start=1):
 		groups = match.groups()
-	return {'id': groups[0], 'tag': groups[1], 'params': groups[2], 'text': groups[-1]}
+	try:	
+		return {'id': groups[0], 'tag': groups[1], 'params': groups[2], 'text': groups[-1]}
+	except:
+		print(text)
 
 def write_archive(dict_tw, filestr="tw_db.data") :
 	file = open(filestr, "w")
 	for key in dict_tw :
 		file.write(("(" + key + "," + dict_tw[key]['tag'] + dict_tw[key]['params'] +")" + remove_emoji(dict_tw[key]['text'].replace("\n", "")) + "\n"))
+	file.close()
+
+
+def write_annotated(dict_tw, filestr="tw_db.data") :
+	file = open(filestr, "w")
+	for key in dict_tw :
+		if dict_tw[key]['tag'] != '???' :
+			file.write(("(" + key + "," + dict_tw[key]['tag'] + dict_tw[key]['params'] +")" + remove_emoji(dict_tw[key]['text'].replace("\n", "")) + "\n"))
 	file.close()
 
 
@@ -174,9 +185,7 @@ def merge_new_data(filestr) :
 	# print(len(ids))
 	file.close()
 
-	file = open(filestr, "r")
-	newvalues = parse_file(file)
-	file.close()
+	newvalues = parse_archive(filestr)
 
 	for key in newvalues :
 		if not key in ids :
@@ -212,13 +221,22 @@ def merge_formatted_data(filestr1, filestr2) :
 
 # two_pass()
 
-import sys
-if len(sys.argv) > 1 :
-	if sys.argv[1] == "--merge" :
-		merge_new_data("data.txt")
-	elif sys.argv[1] == "--merge2" :
-		merge_formatted_data(sys.argv[2], sys.argv[3])
-	elif sys.argv[1] == "--common" :
-		get_common(sys.argv[2], sys.argv[3])
+# import sys
+# if len(sys.argv) > 1 :
+# 	if sys.argv[1] == "--merge" :
+# 		merge_new_data("data.txt")
+# 	elif sys.argv[1] == "--merge2" :
+# 		merge_formatted_data(sys.argv[2], sys.argv[3])
+# 	elif sys.argv[1] == "--common" :
+# 		get_common(sys.argv[2], sys.argv[3])
 
-remove_emoji_file("groupe_5.txt")
+# remove_emoji_file("groupe_5.txt")
+
+# merge_new_data("groupe_4.txt")
+# merge_new_data("groupe2final.txt")
+# merge_new_data("groupe_5.txt")
+# merge_new_data("groupe_9_final.txt")
+# merge_new_data("tweets_groupe_6.txt")
+
+values = parse_archive()
+write_annotated(values, "tw_db_final.txt")
