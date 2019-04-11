@@ -5,6 +5,11 @@
 pip install python-twitter
 ``` 
 
+### Extraction 
+skeleton.py utilise l'api twitter pour récupérer des tweets sur le sujet qui nous intéresse, en Français
+
+#################### RESTE #######################
+
 Consumer API keys
 P6OXKneDo1VgIsLaf7Hfz71pb (API key)
 
