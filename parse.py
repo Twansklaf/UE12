@@ -76,7 +76,7 @@ def parse_file(file) :
 			tmpvalue = {}
 		else :
 			if reading :
-				tmpvalue['text'] += line.split('_n')[0]
+				tmpvalue['text'] += line.split('\n')[0]
 	return values
 
 
@@ -130,7 +130,7 @@ def parse_tweet(text):
 def write_archive(dict_tw, filestr="tw_db.data") :
 	file = open(filestr, "w")
 	for key in dict_tw :
-		file.write(("(" + key + "," + dict_tw[key]['tag'] + dict_tw[key]['params'] +")" + remove_emoji(dict_tw[key]['text'].replace("\n", "")) + "\n"))
+		file.write(("(" + key + "," + dict_tw[key]['tag'] +")" + remove_emoji(dict_tw[key]['text'].replace("\n", "")) + "\n"))
 	file.close()
 
 
@@ -221,14 +221,21 @@ def merge_formatted_data(filestr1, filestr2) :
 
 # two_pass()
 
-# import sys
-# if len(sys.argv) > 1 :
-# 	if sys.argv[1] == "--merge" :
-# 		merge_new_data("data.txt")
-# 	elif sys.argv[1] == "--merge2" :
-# 		merge_formatted_data(sys.argv[2], sys.argv[3])
-# 	elif sys.argv[1] == "--common" :
-# 		get_common(sys.argv[2], sys.argv[3])
+import sys
+if len(sys.argv) > 1 :
+	if sys.argv[1] == "--merge" :
+		merge_new_data("data.txt")
+	elif sys.argv[1] == "--merge2" :
+		merge_formatted_data(sys.argv[2], sys.argv[3])
+	elif sys.argv[1] == "--common" :
+		get_common(sys.argv[2], sys.argv[3])
+	elif sys.argv[1] == "--parse":
+		file = open(sys.argv[2], 'r')
+		values = parse_file(file)
+		for k in values :
+			values[k]['tag'] = '???'
+		file.close()
+		write_archive(values, "new_twt.txt")
 
 # remove_emoji_file("groupe_5.txt")
 

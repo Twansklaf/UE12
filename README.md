@@ -1,6 +1,9 @@
 # UE12
 ## Projet UE12 Extraction de l'information
 
+lien du git :
+https://github.com/Twansklaf/UE12
+
 #### Requirements
 
 __Dependencies__
@@ -25,9 +28,7 @@ source bin/activate
 pip install ipykernel
 python -m ipykernel install --user
 
-```
-
-
+``` 
 
 ```python
 pip install python-twitter
@@ -36,7 +37,17 @@ pip install python-twitter
 ### Extraction 
 skeleton.py utilise l'api twitter pour récupérer des tweets sur le sujet qui nous intéresse, en Français
 
+parse.py contient des fonctions utiles pour manipuler les tweets extraites, et les formatter sur le format défini en cours.
 
+word_toosl.py contient des fonctions qui sont utiles pour la préparation des données pour les modèles de ML
+
+### Récupération de données
+
+Pour récupérer les données, on lance 
+```bash
+python skeleton.py > output.txt
+python parse.py --parse data.txt
+```
 ### Entrainement des modèles
 Divers modèle sont écrits dans les jupyter notebook. 
 Deux sont basés sur LTSM, les autres sont des modèles "custom". Parmi ces custom, deux sont basés sur

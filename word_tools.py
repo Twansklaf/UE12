@@ -1,6 +1,6 @@
 import re
 import sys
-from parse import parse_tweet, parse_archive
+from parse import parse_tweet, parse_archive, write_archive
 
 def get_list_tweet(filestr) :
 	list_tw = []
@@ -191,6 +191,12 @@ if len(sys.argv) > 1 :
 		copy_tweet_database(sys.argv[2])
 
 
+import sys
+if len(sys.argv) > 1 :
+	if sys.argv[1] == "--merge" :
+		copy_tweet_database(sys.argv[2], sys.argv[3])
+
+
 # print(len(dico))
 # vects = vectorize_tweets("tw_db_prepared.data", "dico.txt")
 # print(len([k for k in vects]))
@@ -205,4 +211,22 @@ if len(sys.argv) > 1 :
 	
 # 	file = open(filestr, 'r')
 
-# copy_tweet_database("groupe_8.data", "groupe_8.data")
+valuesA = parse_archive("g5remi.data")
+valuesR = parse_archive("g5antoine.data")
+
+idsA = [k for k in valuesA]
+idsR = [k for k in valuesR]
+
+iddiff = [id for id in idsA if valuesA[id]['tag'] != valuesR[id]['tag']]
+
+print(len(iddiff))
+
+wrong = {}
+
+for k in iddiff :
+	wrong[k] = valuesA[k]
+
+for k in wrong :
+	wrong[k]['tag'] = '???'
+
+write_archive(wrong, "convergence.txt")
