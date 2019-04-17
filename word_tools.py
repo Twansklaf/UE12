@@ -89,7 +89,10 @@ def copy_tweet_database(filestr, copystr) :
 	fileout = open(copystr, 'w')
 	for line in file.readlines() :
 		tw = parse_tweet(line)
-		fileout.write("(" + str(tw['id']) + "," + tw['tag'] + ")" + processTweet(tw['text']) + "\n")
+		try:
+			fileout.write("(" + str(tw['id']) + "," + tw['tag'] + ")" + processTweet(tw['text']) + "\n")
+		except:
+			print(line)
 	file.close()
 	fileout.close()
 
@@ -116,6 +119,30 @@ def vectorize_tweets(filestr, dico) :
 			else :
 				vectors[id]['label'] = [0, 0, 0, 0]
 			vectors[id]['label'] = np.array(vectors[id]['label'])
+			tmp_vect = []
+			for word in vectors[id]['text'].split(' ') :
+				try :
+					tmp_vect.append(dico.index(word))
+				except:
+					tmp_vect.append(0)
+			if len(tmp_vect) < max_tweet_size :
+				tmp_vect += [0 for i in range(max_tweet_size - len(tmp_vect))]
+			vectors[id]['vectorized'] = np.array(tmp_vect)
+
+	return vectors
+
+def vectorize_tweetsNB(filestr, dico) :
+	values = parse_archive(filestr)
+	vectors = {}
+	import numpy as np
+	max_tweet_size = np.max([len(values[id]['text'].split(' ')) for id in values])
+
+
+	for id in values :
+		if values[id]['tag'] != "???" : 
+			vectors[id] = {'text' : values[id]['text']}
+			
+			vectors[id]['label'] = np.array(values[id]['tag'])
 			tmp_vect = []
 			for word in vectors[id]['text'].split(' ') :
 				try :
@@ -193,7 +220,7 @@ if len(sys.argv) > 1 :
 
 import sys
 if len(sys.argv) > 1 :
-	if sys.argv[1] == "--merge" :
+	if sys.argv[1] == "--format" :
 		copy_tweet_database(sys.argv[2], sys.argv[3])
 
 
@@ -211,22 +238,22 @@ if len(sys.argv) > 1 :
 	
 # 	file = open(filestr, 'r')
 
-valuesA = parse_archive("g5remi.data")
-valuesR = parse_archive("g5antoine.data")
+# valuesA = parse_archive("g5remi.data")
+# valuesR = parse_archive("g5antoine.data")
 
-idsA = [k for k in valuesA]
-idsR = [k for k in valuesR]
+# idsA = [k for k in valuesA]
+# idsR = [k for k in valuesR]
 
-iddiff = [id for id in idsA if valuesA[id]['tag'] != valuesR[id]['tag']]
+# iddiff = [id for id in idsA if valuesA[id]['tag'] != valuesR[id]['tag']]
 
-print(len(iddiff))
+# print(len(iddiff))
 
-wrong = {}
+# wrong = {}
 
-for k in iddiff :
-	wrong[k] = valuesA[k]
+# for k in iddiff :
+# 	wrong[k] = valuesA[k]
 
-for k in wrong :
-	wrong[k]['tag'] = '???'
+# for k in wrong :
+# 	wrong[k]['tag'] = '???'
 
-write_archive(wrong, "convergence.txt")
+# write_archive(wrong, "convergence.txt")

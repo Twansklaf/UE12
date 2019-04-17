@@ -117,15 +117,20 @@ def init_annotation_app(filestr="tw_db.data") :
 
 def parse_tweet(text):
 	import re
-	regex = r"^\(([0-9]+),(\?\?\?|neu|pos|neg|irr)(,([^,\)]*))*\)(.*)$"
+	# regex = r"^\(([0-9]+),(\?\?\?|neu|pos|neg|irr)(,([^,\)]*))*\)(.*)$"
+	regex = r"\(([0-9]*),(\?\?\?|irr|neu|neg|pos)(,\w*)*\)(.*)"
 
 	matches = re.finditer(regex, text, re.MULTILINE)
 	for matchNum, match in enumerate(matches, start=1):
 		groups = match.groups()
 	try:	
 		return {'id': groups[0], 'tag': groups[1], 'params': groups[2], 'text': groups[-1]}
-	except:
-		print(text)
+	except Exception as ex:
+	    template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+	    message = template.format(type(ex).__name__, ex.args)
+	    print (message)
+	    for matchNum, match in enumerate(matches, start=1):
+	    	print(match)
 
 def write_archive(dict_tw, filestr="tw_db.data") :
 	file = open(filestr, "w")
